@@ -1,0 +1,7 @@
+click
+matplotlib
+pillow
+toml
+scipy
+joypy
+pint

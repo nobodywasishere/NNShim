@@ -1,0 +1,81 @@
+[3d_ice]
+
+# 3d-ice stack file template (without extension)
+stk_template = 'NNShim_template'
+
+# nnshim floorplan output file
+floorplan_file = 'nnshim_floorplan.flp'
+
+# technology node, e.g. '14nm'
+tech_node = '14nm'
+
+# 3d-ice output director
+output_directory = 'sim'
+
+# initial temperature in Celsius
+initial_t = 40
+
+heatsink_args = '6000'
+
+
+[scalesim]
+
+# file that contains a 4d numpy representation of the 
+#   activity map of the processor, exported from SCALE-Sim
+activity_map_file = '${activity_map}'
+
+# contains a 3d np array of the activity map for the buffers,
+#   exported by SCALE-Sim
+buffer_bandwidth_file = '${buffer_map}'
+
+# Number of cycles per sample of the activity and bandwidth arrays
+cycles_per_sample = 10000
+
+# Number of repetition for the activity and bandwidth arrays
+neural_network_repetition = 150
+
+
+[systolic_array]
+
+# clock rate of the systolic array in Hz
+clock_rate = ${clock_rate}
+
+# Minimum timestep for simulation in seconds
+# target_timestep_min = 50e-6
+target_timestep_min = 50e-6
+
+# Power or fraction of 2
+# x:y
+aspect_ratio = ${aspect_ratio}
+
+# row column skipping
+row_skipping = ${row_skipping}
+col_skipping = ${col_skipping}
+
+[processing_element]
+
+# Size of the array in elements
+array_size = { x = ${arr_x}, y = ${arr_y} }
+
+# Size of array for simulation
+power_array_size = { x = ${arr_x}, y = ${arr_y} }
+
+# Size of each element in um
+element_size = { x = 40, y = 40 }
+
+# energy used per operation in Joules
+# per_op_energy_J = 0.3e-12
+per_op_energy_J = 3e-12
+
+# Spacing between array elements in um
+pe_spacing_um = 10
+
+
+[buffer]
+
+# Area of the buffer in um^2
+area = ${buffer_area}  # 6240384
+
+# Read/write energy in J
+read_energy_J = 1.1e-12
+write_energy_J = 1.5e-12

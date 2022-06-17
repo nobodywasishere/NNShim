@@ -112,3 +112,8 @@ ENV/
 
 # Saved python objects
 *.pkl
+
+3d-ice
+McPAT
+examples
+scalesim
