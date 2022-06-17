@@ -4,6 +4,7 @@ import os
 import glob
 import matplotlib
 import matplotlib.pyplot as plt
+import csv
 
 import numpy as np
 import pandas as pd
@@ -116,7 +117,7 @@ def plot_temps(ttrace, axes=None, tmin=None, tmax=None):
                              desc='ttrace timestep thermal image'):
         im = ax.imshow(t_i, interpolation=None, vmin=tmin, vmax=tmax, cmap='plasma')
         cbar = ax.figure.colorbar(im, ax=ax)
-        cbar.ax.set_ylabel('Temperature (K)', rotation=-90, va="bottom")
+        cbar.ax.set_ylabel('Temperature (C)', rotation=-90, va="bottom")
     return axes
 
 def plot_power_density(pd_trace, axes=None, pd_min=None, pd_max=None):
@@ -203,7 +204,7 @@ def _get_px_size_mm_from_flp_ttrace(flp, ttrace):
     flp.frmt = '3D-ICE' # make sure units in um
     px_width = flp.width / ttrace[0].shape[1]
     px_height = flp.height / ttrace[0].shape[0]
-    assert abs(px_height-px_width) < 1, 'Pixels must be square for this analysis'
+    assert abs(px_height-px_width) < 5, 'Pixels must be square for this analysis' # TODO: change back to < 1
     px_height_mm = px_height / 1000.0
     flp.frmt = old_frmt
     return px_height_mm
@@ -240,10 +241,25 @@ def hotspot_locations(ice_grid_file, floorplan_file, mltd_radius, output_format,
     if local_max_stats is not None:
         stats_df = local_max_stats_from_file(local_max_stats)
         stats_df['hotspot_severity'] = severity_metric(stats_df['MLTD'], stats_df['temp_xy'])
+        st_cpy_df = stats_df
+        max_severity = []
+        max_temp = []
         stats_df = stats_df[stats_df.hotspot_severity >= severity_threshold]
         for step, ax in enumerate(axes):
             candidates_df = stats_df[stats_df.time_step == step]
+            st_step_df = st_cpy_df[st_cpy_df.time_step == step]
+            if (not st_step_df['hotspot_severity'].empty):
+                max_severity.append(max(st_step_df['hotspot_severity']))
+            else:
+                max_severity.append(0)
+            if (not st_step_df['temp_xy'].empty):
+                max_temp.append(max(st_step_df['temp_xy']))
             candidates_df.apply(lambda r: label_hotspot(ax, r['x_idx'], r['y_idx'], mltd_px), axis=1)
+        with open('hotspots_summary.csv', 'w', newline='') as fi:
+            csvfi = csv.writer(fi, delimiter=',')
+            csvfi.writerow(max_severity)
+            csvfi.writerow(max_temp)
+        # print(max_severity)
             
     for step, ax in enumerate(axes):
         fig = ax.get_figure()

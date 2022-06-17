@@ -497,8 +497,8 @@ class FloorplanElement(object):
    def frmt_for_flp_file_3DICE(self, powers=None):
       if powers is None:
           power_str = ''
-      elif isinstance(powers, dict):
-        power_str = '\tpower values {}\n'.format(', '.join(map(str, powers)))
+      elif isinstance(powers, dict) or isinstance(powers, list): 
+        power_str = '\tpower values {} ;\n'.format(', '.join(map(str, powers)))
       elif powers == True:
           power_str = '\tpower values {{powers[{}]}};\n'.format(self.name)
       x,y = self.minx, self.miny

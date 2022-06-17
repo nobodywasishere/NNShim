@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 import os
 from collections import defaultdict
+from matplotlib.pyplot import axis
 
 import pandas as pd
 import click
 import numpy as np
-from scipy.signal import argrelmax
+from scipy.signal import argrelmax, argrelextrema
 
 from HotGauge.thermal.ICE import load_3DICE_grid_file
 from HotGauge.utils.io import open_file_or_stdout
@@ -115,6 +116,11 @@ def local_max_stats_from_file(local_max_stats_file):
 def _local_max_indices_2D(data):
     axis_0_maxs = set(zip(*argrelmax(data, axis=0)))
     axis_1_maxs = set(zip(*argrelmax(data, axis=1)))
+    #! if we don't find any 'true' maxima, lower what we consider a maxima from > neighbors to >= neighbors
+    if (len(axis_0_maxs) == 0):
+        axis_0_maxs = set(zip(*argrelextrema(data, np.greater_equal, axis=0)))
+    if (len(axis_1_maxs) == 0):
+        axis_1_maxs = set(zip(*argrelextrema(data, np.greater_equal, axis=1)))
     return list(axis_0_maxs.intersection(axis_1_maxs))
 
 def _local_max_indices_1D(data):
